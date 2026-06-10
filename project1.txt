@@ -1,0 +1,131 @@
+1. Abstract
+
+Bharathanatyam is a highly codified classical dance form that relies on complex hand gestures (Mudras), facial expressions (Navarasas), and full-body postures to convey intricate narratives. Digitally transcribing these rapid, interconnected movements is conventionally a manual, resource-intensive process requiring significant domain expertise. To standardize this process and preserve the artform digitally, this project introduces "Natyam Transcribe," an advanced, real-time web application that automates the transcription of Bharathanatyam performances. By synthesizing Google's MediaPipe Holistic Deep Learning model for 3D skeletal tracking with a custom-engineered mathematical heuristic engine, the system accurately classifies 28 fundamental Mudras, 9 core expressions, and dynamic full-body postures directly in the user's browser, eliminating the need for expensive motion-capture hardware or cloud-based processing. The proposed architecture functions as a hybrid system: it utilizes advanced 3D distance algorithms to resolve complex self-occlusions inherent in traditional hand gestures, while also integrating a K-Nearest Neighbors (k-NN) machine learning classifier via a "Teach AI" module that allows users to train the system on unrecognized choreographic elements dynamically. Designed with a responsive interface, the platform supports real-time video analysis, static picture capture, and gallery media import. Furthermore, a temporal sequence analyzer interprets multi-frame transitions (e.g., a blooming lotus) to establish contextual storytelling meaning. Ultimately, Natyam Transcribe serves as a highly accessible educational and archival tool, bridging ancient classical art with modern computational intelligence.
+
+2. Overview
+
+Bharathanatyam relies heavily on a structured vocabulary of movements to convey emotions and narratives. The Abhinaya Darpanam dictates the precise execution of Asamyuta Hastas (single-hand gestures), Samyuta Hastas (double-hand gestures), and various facial expressions to express specific meanings. Because the transitions between these states are rapid and context-dependent, providing an automated tool to decipher these elements digitally preserves the ancient art form while opening it to broader audiences.
+
+The primary objective of this project is to develop an accessible, high-performance web-based solution capable of decoding the Bharathanatyam lexicon. Historically, motion capture for dance required expensive hardware and studio setups. By shifting computational analysis to edge devices via web technologies, we remove the hardware barrier, allowing dancers to evaluate their performances or practice sessions directly from standard webcams.
+
+Natyam Transcribe is the culmination of this objective. It encapsulates a fluid, responsive UI built with standard Web Technologies (HTML, CSS, JavaScript) that overlays skeletal tracking data directly onto a user's feed. The application can handle three distinct pipelines: continuous real-time execution, surgical analysis of static snapshots, and the processing of previously captured media.
+
+At its technical foundation, the application interfaces with Google's MediaPipe Holistic to gather skeletal landmarks. These landmarks are passed into a robust JavaScript-based heuristic engine (ML_CORE). This engine uses advanced 3D distance scaling formulas to bypass common camera-occlusion issues while determining finger extension, palm orientation, and facial muscle stretching to output standard terminology and their associated meanings.
+
+3. Proposed System
+
+Natyam Transcribe introduces an entirely client-side, privacy-preserving architectural system capable of translating 28 fundamental Mudras, 9 core expressions (Navarasas), and foundational poses (like Aramandi and Nataraja) with near-instantaneous feedback. Rather than sending visual data to a remote cloud server, all processing logic takes place locally, drastically reducing latency and providing smooth functionality even with constrained internet bandwidth.
+
+The application boasts a dynamic User Interface (UI) featuring three input methods. The Real-time mode processes continuous streams for live feedback. The Picture Capture mode enables deep analysis of held poses, and the Gallery mode allows for post-performance transcriptions. Each mode culminates in an interactive transcription interface that showcases a glowing skeleton overlay, live predictions, and continuously updating log entries.
+
+A significant innovation within the proposed system is its Temporal Sequence Engine. Single-frame analysis is inherently limited because certain storytelling gestures—such as "Blooming Lotus" or "Flying Bird"—require a transition from one distinct state to another. The system buffers incoming frames to evaluate temporal flows, assigning broader narrative meanings when it detects a completed sequence of movements. 
+
+Additionally, the system is designed to be extensible through its built-in "Teach AI" module. If users encounter custom or obscure choreographic gestures outside the pre-programmed 28 Mudras, they can extract the current frame's 3D facial or hand features and map them to a specific label. Using Nearest Neighbor (k-NN) classification, the system dynamically updates its own recognition parameters on the fly, storing these models securely in the browser's local storage.
+
+4. Requirement Analysis
+
+Functional Requirements:
+- The system must capture video from user's webcam or accept image file uploads.
+- The system must accurately draw 3D skeletal topology over the user's video feed.
+- The system must classify 28 Asamyuta Hastas, distinct poses, and Navarasas from tracking points.
+- The system must generate real-time transcription logs detailing the detected Mudra and its meaning.
+- The system must recognize combined gestures (Samyuta Hastas) when both hands maintain the same posture.
+- The system must detect temporal sequences that span multiple frames.
+- The system must provide a mechanism for users to train new models manually in real-time.
+
+Non-Functional Requirements:
+- Performance: The application must execute inference at high framerates (>20 FPS) entirely within the browser.
+- Usability: The interface must feature a dark-themed, premium, glass-morphism aesthetic that is intuitive to navigate.
+- Availability: Once assets are cached, the core engine must be capable of running offline.
+- Privacy: The system must not upload user camera data to any external server.
+- Stability: The system must feature anti-flicker logic to maintain gesture predictions if tracking is briefly lost.
+
+5. Modules in Methodology
+
+The methodology is structured into several interconnected modules that pipeline data from the user's camera straight through to final inference. Each module is detailed below:
+
+- Hardware Access Module: 
+This module forms the entry point of the system by handling the retrieval of visual data. It securely interfaces with the browser's MediaDevices API to stream a continuous video feed from standard webcams at 720p resolution. In addition to live-stream initialization, it houses the asynchronous JavaScript logic to manage static Picture Captures and asynchronous FileReader events for parsing externally selected gallery image uploads into a unified processing canvas.
+
+- AI Landmarking Module: 
+This deep-learning abstraction layer integrates Google's MediaPipe Holistic platform. Utilizing internal Convolutional Neural Networks, this module performs real-time body-segmentation to isolate the dancer from their background. It computes and maps 543 distinct 3-Dimensional landmarks: 33 overarching pose coordinates, 21 individual coordinates for the left hand, 21 for the right hand, and 468 granular mesh intersections plotting the contours of the performer's facial structure.
+
+- Feature Extraction & Normalization Module: 
+Because dancers will utilize the application from various distances relative to their webcams, raw 3D coordinates are insufficient for classification. This module filters out extraneous skeletal data and performs robust mathematical scaling. By defining localized anchor points (e.g., calculating distance relationships between the wrist and the physical center of the palm), it generates a normalized feature vector. This ensures recognized coordinates remain consistently proportional regardless of if the dancer's hand occupies 10% or 50% of the specific camera frame.
+
+- Core Inference Heuristic Module: 
+This algorithmic module represents the system's codified domain expertise. It bypasses the need for massive pre-trained gesture image databases by transferring the anatomical rules of the Abhinaya Darpanam into executable geometry. Instead of matching an image, this module actively computes structural thresholds—for example, measuring Euclidean distances to verify if the index finger stretches beyond the knuckle's base radius while the thumb curves tightly across the central palm. Through this 3D-oriented geometric verification, it successfully and rapidly classifies 28 classical single-hand Mudras, full-body poses (e.g., Aramandi vs. Muzhumandi), and measures muscle stretches indicating the 9 core Navarasas (Expressions).
+
+- Custom Machine Learning (k-NN) Module: 
+Operating as a specialized complement to the main inference system, this module drives the localized "Teach AI" feature. If a choreography involves a rare or non-standard gesture, this module captures the active normalized feature extraction array and maps it to a user-defined text label natively in the browser. Using a k-Nearest Neighbors (k-NN) classification methodology, it calculates Euclidean distances to evaluate live vectors against these new unique templates. It enables the system to continuously learn and dynamically predict user-invented postures.
+
+- Temporal Sequence Analyzer Module: 
+Bharathanatyam relies on kinetic storytelling flows rather than exclusively stationary posing. Because traditional frame-by-frame classifiers are limited to static postures, this tracking module instantiates a sliding timeline buffer that caches predictions across the previous 40 frames. By querying historical states, it actively evaluates temporal transitions. For example, if it detects a user transitioning from tightly clenched 'Mukula' hands (State A) spreading outwards into expanded 'Alapadma' hands (State B), the sequence engine intercepts and outputs the cohesive narrative meaning of a "Blooming Lotus."
+
+- User Interface & Presentation Module: 
+This front-end web segment translates internal numerical states into human comprehension. It processes internal Javascript dictionaries to append rich narrative meanings directly to their respective Sanskritic categorizations. The UI module consequently orchestrates the visual aesthetic layers, controlling the responsive dark-themed 'glassmorphic' layout, rendering geometric color-coded skeletal structures directly onto the user's video feed mirror, mapping inference speeds via frames-per-second trackers, and committing finalized actions into the persistent scrolling transcription history log.
+
+6. Data Flow Diagram
+
+(1) User Input Data -> (Webcam Stream / Uploaded Image)
+(2) Preprocessing -> (MediaPipe engine resizes and processes frame)
+(3) Feature Generation -> (MediaPipe generates X,Y,Z coordinates for skeleton)
+(4) Normalization -> (Software isolates Hands, Face, and Pose geometries and scales them)
+(5) Classification -> (Engine applies 3D distance rules & k-NN validation to predict State)
+(6) Temporal Buffering -> (Predicted state placed in sliding timeline window)
+(7) Post-Processing -> (Temporal engine checks for sequence completions and applies combined hand rules)
+(8) UI Rendering -> (HTML DOM elements updated; Canvas overlays drawn; Meaning assigned to log) -> Output to User
+
+7. Implementation Steps
+
+- Step 1: UI/UX Setup: Develop HTML structure, apply CSS tokens (colors, fonts), and create CSS classes for a premium 'glassmorphic' layout with smooth hover effects and responsive grid displays.
+- Step 2: MediaPipe Inclusion: Import holistic, camera, and drawing utilities from MediaPipe's CDN.
+- Step 3: Hardware Initialization: Program JavaScript events to request browser webcam permissions and pipe video streams to a hidden video element for asynchronous processing.
+- Step 4: Canvas Overlay Rendering: Configure 2D Canvas Context to invert frames (acting as a mirror) and draw color-coded geometric lines over detected skeleton points.
+- Step 5: Heuristic Engine programming: Write logical branching functions defining exactly how fingers are extended or folded (e.g., analyzing distances between knuckle bases and finger tips) for all 28 Mudras.
+- Step 6: Expression & Pose Logic: Extend the heuristic engine to track mouth width/height, eyebrow arches, and hip-to-ankle ratios for Navarasas and posture detection.
+- Step 7: Temporal Architecture Building: Develop arrays to hold recent gesture histories. Write validation functions that scan backwards to find distinct transitions like the "Drawing a Bow" sequences.
+- Step 8: Logging and Meaning Dictionary: Map predicted strings to extensive descriptive dictionaries and implement UI DOM-manipulation functions to inject new formatted entry modules into the transcription log.
+- Step 9: Testing and Optimization: Refine distance thresholds based on empirical testing with dancers and configure anti-flicker buffers to ignore 1-2 frame tracking drops.
+
+8. Architecture Diagram
+
+Client Browser Tier:
+[ Landing UI ] <--> [ Dashboard UI ] <--> [ Logs & Feedback Overlays ]
+       |                   |                       |
+       v                   v                       v
+Logic & Controller Tier:
+[ HW Camera API ] -> [ State Manager ] -> [ DOM Interaction Component ]
+       |                   |
+       v                   v
+Processing Tier (ML & Heuristics):
+[ MediaPipe Holistic Model ] => (Produces Coordinate Vectors)
+       |
+       v
+[ Normalizer ] -> [ Core Heuristic Classifier (Mudras/Poses/Faces) ] 
+       |                                     + [ K-NN Trainer & Predictor ]
+       v
+[ Temporal Sequence Analyzer (Buffer) ]
+       |
+       v
+[ Rules Engine (Dictionary & Meaning Combiner) ] => (Outputs back to UI Tier)
+
+9. Dataset and Experimental Setup
+
+Dataset: The core classification system does not rely on a traditional massive dataset of images fed through a Convolutional Neural Network. Instead, the "dataset" comprises a domain-expert curated set of mathematical thresholds regarding human anatomy in 3D space. By measuring internal relationships of the hand (e.g., index tip distance relative to the palm center), the system possesses native 360-degree tolerance. For custom configurations, the system generates real-time feature vector datasets directly from the user's camera when clicking "Train Frame", storing arrays of normalized coordinates representing the new label.
+
+Experimental Setup: Evaluated on local client machines, the system utilized standard integrated laptop webcams operating at 720p resolution. Various subjects performed a predefined sequence of the 28 Mudras in varied lighting conditions (natural daylight vs. artificial low-light). The testing explicitly focused on analyzing stability when subjects wore traditional Bharathanatyam clothing, leading to tweaks that allow posture inference even during partial lower-body occlusion caused by heavy sarees.
+
+10. Functional Results
+
+The implementation of Natyam Transcribe yielded a highly responsive, accurate, and real-time transcription platform. During active testing, the system successfully identified and logged the 28 fundamental Asamyuta Hastas and 9 Navarasas with minimal latency, maintaining inference speeds exceeding 20 frames per second on standard consumer hardware. The application's core functional requirements were validated as it seamlessly handled inputs across all three modes: live webcam streams, static picture captures, and gallery media uploads. The dynamic UI continuously updated the transcription log with accurate narrative meanings and displayed the skeletal overlay with precision. Furthermore, the temporal sequence analyzer reliably detected multi-frame transitions, and the custom k-NN "Teach AI" module effectively enabled users to train and predict new gestures on the fly. Overall, the system robustly translated complex 3D spatial coordinations into a continuous, reliable, and user-friendly transcription pipeline.
+
+11. Discussion and Limitations
+
+The model demonstrates exceptional resilience and processing speed, primarily because the heavy lifting consists of coordinate mathematics rather than deep tensor convolutions inside the browser. It reliably detects Samyuta Hastas and connects corresponding meanings accurately in sub-50 millisecond inference times. However, inherent limitations lie in the underlying MediaPipe holistic mapping. During extremely complex gestures where fingers intertwine tightly (e.g., Karkata mudra) or are largely hidden from the camera lens due to extreme angles, the 3D landmarking can break down or confuse left and right coordinates. The system relies heavily on clear line-of-sight to the hands; thus, rapid, blurred motions in low framerate or low-light scenarios negatively impact the transcription accuracy. Future upgrades would require specialized multi-view camera tracking to fully bypass line-of-sight occlusion limitations.
+
+12. Conclusion
+
+The Natyam Transcribe application successfully realizes the intersection of ancient classical dance and modern Computer Vision. By synthesizing MediaPipe's skeletal tracking with purpose-built Bharathanatyam heuristics, it provides an elegant, real-time decoding service. The integration of live feedback, sequence tracking, and real-time machine learning empowers users to interact with the system intuitively, ensuring that the technology is robust, extensible, and genuinely useful to dancers.
+
+Ultimately, this project serves not merely as a technical showcase, but as an educational and archival tool. For students, it provides instantaneous validation of posture and gesture accuracy without the strict supervision of a Guru. For audiences and enthusiasts, it deciphers the rich, poetic narratives woven deeply into the artform, bridging the gap between historical expression and computational intelligence.
